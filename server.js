@@ -158,7 +158,7 @@ app.delete('/users/:id', authenticate, isAdmin, async (req, res) => {
   if (user.role === 'admin') {
     return res.status(403).json({ message: 'Cannot delete the default admin user' });
   }
-  
+
   await user.destroy();
   res.json({ message: 'User deleted successfully' });
 });
@@ -167,3 +167,5 @@ app.delete('/users/:id', authenticate, isAdmin, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = app;
