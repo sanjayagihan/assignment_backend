@@ -105,8 +105,8 @@ app.get('/users', authenticate, async (req, res) => {
   res.json(users);
 });
 
-// Create New User
-app.post('/users', authenticate, async (req, res) => {
+// Create New User (Admin Only)
+app.post('/users', authenticate, isAdmin, async (req, res) => {
   const { username, firstname, lastname, password, role } = req.body;
 
   if (!username || !firstname || !lastname || !password) {
@@ -130,8 +130,8 @@ app.post('/users', authenticate, async (req, res) => {
   res.status(201).json({ id: newUser.id, username: newUser.username, role: newUser.role });
 });
 
-// Update User
-app.put('/users/:id', authenticate, async (req, res) => {
+// Update User (Admin Only)
+app.put('/users/:id', authenticate, isAdmin, async (req, res) => {
   const { id } = req.params;
   const { username, firstname, lastname, password, role } = req.body;
 
@@ -155,6 +155,10 @@ app.delete('/users/:id', authenticate, isAdmin, async (req, res) => {
   const user = await User.findByPk(id);
   if (!user) return res.status(404).json({ message: 'User not found' });
 
+  if (user.role === 'admin') {
+    return res.status(403).json({ message: 'Cannot delete the default admin user' });
+  }
+  
   await user.destroy();
   res.json({ message: 'User deleted successfully' });
 });
